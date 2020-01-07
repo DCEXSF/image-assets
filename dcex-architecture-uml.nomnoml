@@ -1,0 +1,63 @@
+[<package>Crypto wallet | 
+  [deposit service] --:> [Crypto Library]
+  [withdraw service] --:> [Crypto Library]
+]
+[Crypto wallet] <--> [<instance>Crypto Blockchain Node]
+[Crypto wallet] --> [<database>MySQL 1]
+
+[UI Layout | 
+  [<actor>User] -> [middleware]
+  [middleware] -> [<state>server-side rendered]
+  [middleware] -> [<choice>authenticate]
+  [server-side rendered] -> [web pages | login | signup | homepage | other static pages]
+  [authenticate] -> [Single page application | Market | Wallet | Profile | Orders]
+  [local storage] -> [app state]
+  [mutations] -> [local storage]
+  [mutations] -> [app state]
+  [mutations] <- [actions]
+  [app state] -> [getters]
+  [app state] -> [Single page application]
+  [getters] -> [Single page application]
+  [Single page application] -> [actions]
+]
+
+[UI Layout] <--> [<instance>load balancer | dynamic threading]
+
+[Exchange APIs | 
+  [URL handler] --> [views | RESTful APIs]
+  [views] --> [models | map(class object): MySQL table)]
+  
+]
+
+[load balancer] --> [Exchange APIs]
+
+[Exchange APIs] --> [python dependencies]
+[Exchange APIs] --> [MySQL 1]
+
+[e-mail handler | Threads: Concurrent Programming  | 
+  [<transceiver>e-mail RabbitMQ] -> [e-mail workers]
+  [e-mail workers] <- [e-mail monitoring]
+  [e-mail monitoring]
+]
+[Exchange APIs] -> emails [e-mail handler]
+[e-mail handler] --> [MySQL 1]
+
+[Exchange APIs] -> orders [Orders Handler]
+[Orders Handler | 
+  [<transceiver>orders-RabbitMQ] -> [order consumer]
+  [Server Process (multiprocessing)] --:> [pending orders object | Shared between processes]
+  [order consumer] --> [pending orders object]
+  [pending orders object] <-- [<instance>trade engine]
+]
+
+[Orders Handler] --> [MySQL 1]
+
+[Exchange APIs] notify -> [<database>Redis]
+[Redis] <- [socket js]
+[Redis] <- [Price ticker API]
+[socket js] -- [notifications]
+[notifications] -> [UI Layout]
+[Orders Handler] notify -> [Redis]
+
+[MySQL 1] <-> [<database>MySQL 2]
+[MySQL 2] <-- [Metabase]
