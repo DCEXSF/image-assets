@@ -1,0 +1,20 @@
+
+
+
+
+[Exchange APIs] -> orders (new/cancel) [Orders Handler]
+
+[Orders Handler |
+  [<transceiver>orders stored in RabbitMQ to be consumed by the consumer] -> [order consumer]
+  [SyncManager Process to manage syncdict variable] --:> [syncdict variable (def start_server()) to store pending orders object | Shared between multiple services]
+  [order consumer] --> [syncdict variable (def start_server()) to store pending orders object | Shared between multiple services]
+  [syncdict variable (def start_server()) to store pending orders object | Shared between multiple services] <-- [<instance>trade engine pulls pending orders object and construct order book]
+]
+
+[Orders Handler] --> [<database>MySQL 1]
+
+[Exchange APIs] notify users -> [<database>Redis]
+[Redis] <- [socket js]
+[socket js] -- [notifications]
+[notifications] -> [UI Layout]
+[Orders Handler] notify -> [Redis]

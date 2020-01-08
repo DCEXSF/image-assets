@@ -1,0 +1,4 @@
+[Order services. Launch in the following sequence. Refer README.md |
+  [startmanager | initiates syncdict variable in the memory. syncdict variable holds pending orders coming from the rabbitmq consumer] -> [order_consumer | consumes orders from the rabbitmq and sends them to syncdict_variable to be consumed by the trade engine]
+  [order_consumer | consumes orders from the rabbitmq and sends them to syncdict_variable to be consumed by the trade engine] -> [startengine | a trade engine which consumes orders from syncdict variable and process it to the order book. It also constructs the orderr book and perform necessary logic]
+]
